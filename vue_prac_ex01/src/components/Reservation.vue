@@ -1,0 +1,137 @@
+<template>
+  <main class="booking">
+    <h1>호텔 예약</h1>
+    <!-- 날짜 선택 -->
+    <div class="form-group">
+      <label>
+        체크인 날짜 :
+        <input type="date" v-model="checkIn" />
+      </label>
+    </div>
+    <!--  -->
+    <div class="form-group">
+      <label>
+        체크아웃 날짜 :
+        <input type="date" v-model="checkOut" />
+      </label>
+    </div>
+    <!-- 인원선택 -->
+    <div class="form-group">
+      <label>
+        인원 :
+        <input type="number" min="1" v-model="people" />
+      </label>
+    </div>
+    <!-- 결과 -->
+    <section class="result">
+      <h2>예약 확인</h2>
+      <ul>
+        <li>
+          체크인 날짜 : <strong>{{ checkIn }}</strong>
+        </li>
+        <li>
+          체크아웃 날짜 : <strong>{{ checkOut }}</strong>
+        </li>
+        <li>
+          숙박 일수 : <strong>{{ nights }} 박</strong>
+        </li>
+        <li>
+          총 인원 : <strong>{{ people }} 명</strong>
+        </li>
+        <li class="price">총 금액 : <strong>{{totalPrice}} 원</strong></li>
+      </ul>
+    </section>
+  </main>
+</template>
+
+<script setup>
+import { computed , ref } from "vue";
+// 변경되는 값:ref
+const checkIn = ref("");
+const checkOut = ref("");
+const people = ref(1);
+// 계산된 값 : computed
+// 숙박 일수를 자동으로 계산하는 computed
+const nights = computed(() => {
+  // 체크인 또는 체크아웃 날짜가 없으면
+  if (!checkIn.value || !checkOut.value) return 0;
+  // 사용자가 선택한 체크인 날짜를 Date객체로 바꿈
+  const inDate = new Date(checkIn.value);
+  const outDate = new Date(checkOut.value);
+  // console.log(`체크인 날짜 : ${inDate}, 체크아웃 날짜 :${outDate}`);
+  // 날짜 차이 계산(밀리초 단위 => 일 단위로 변환)
+  const diff = (outDate - inDate) / (1000 * 60 * 60 * 24);
+  return diff > 0 ? diff : 0;
+  //   1박 - 숙박요금 (50000)
+  const pricePerNight = 50000;
+  //   총금액을 자동으로 계산하는 공식
+  const totalPrice = computed(() => {
+    return nights.value * pricePerNight;
+  });
+});
+// console.log(nights.value);
+</script>
+
+<style scoped>
+.booking {
+  max-width: 450px;
+  margin: auto;
+  padding: 1.5rem;
+  border-radius: 16px;
+  background: #f9fafc;
+  font-family: "Segoe UI", sans-serif;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+h1 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #2c3e50;
+}
+.form-group {
+  margin-bottom: 1rem;
+}
+label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  color: #34495e;
+}
+input {
+  flex: 1;
+  margin-left: 0.5rem;
+  padding: 0.4rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+.result {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+.result h2 {
+  margin-bottom: 0.8rem;
+  font-size: 1.1rem;
+  color: #2c3e50;
+}
+.result ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.result li {
+  margin: 0.4rem 0;
+  font-size: 0.95rem;
+  color: #555;
+}
+.result strong {
+  color: #000;
+}
+.result .price {
+  margin-top: 0.8rem;
+  font-size: 1.05rem;
+  font-weight: bold;
+  color: #e74c3c;
+}
+</style>
