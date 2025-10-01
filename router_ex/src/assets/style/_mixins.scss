@@ -13,7 +13,7 @@
     background-color: darken($bg, 10%);
   }
 }
-// card
+// card 
 @mixin card-style{
     background-color: $card-bg;
     box-shadow: $card-shadow;
