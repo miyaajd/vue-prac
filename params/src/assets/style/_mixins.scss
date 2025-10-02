@@ -1,23 +1,39 @@
-// btn
-@mixin btn-style($bg, $color) {
-  background-color: $bg;
-  color: $color;
-  border: none;
-  padding: 8px 16px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  border-radius: 8px;
-  margin-right: 8px;
+@use "./variables" as *;
+@use "sass:color";
+.btn {
+  display: inline-block;
+  margin: 5px 10px 5px 0;
+  padding: 8px 14px;
+  background: $main-color;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: 0.2s;
   &:hover {
-    background-color: darken($bg, 10%);
+    background: color.adjust($main-color, $lightness: -10%);
+  }
+  &.del {
+    background-color: red;
+    &:hover {
+      background: color.adjust(red, $lightness: -10%);
+    }
   }
 }
-// card 
-@mixin card-style{
-    background-color: $card-bg;
-    box-shadow: $card-shadow;
-    padding: 15px;
-    border-radius: 8px;
-    text-align: center;
+.card {
+  border: 2px solid $card-border;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px 0;
+  background: $card-bg;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    color: $main-color;
+    margin-bottom: 15px;
+  }
+
+  p {
+    font-size: 14px;
+    margin: 5px 0;
+  }
 }

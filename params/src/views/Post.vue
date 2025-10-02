@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="card">
     <h2>Post Details</h2>
     <p>Content Num - {{ postId }}</p>
     <p>Title : {{ post.title }}</p>
@@ -21,4 +21,6 @@ const dummyPosts = {
 post.value = dummyPosts[postId]
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+@use "../assets/style/mixins" as *;
+</style>
