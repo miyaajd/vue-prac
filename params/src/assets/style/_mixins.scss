@@ -1,0 +1,23 @@
+// btn
+@mixin btn-style($bg, $color) {
+  background-color: $bg;
+  color: $color;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  margin-right: 8px;
+  &:hover {
+    background-color: darken($bg, 10%);
+  }
+}
+// card 
+@mixin card-style{
+    background-color: $card-bg;
+    box-shadow: $card-shadow;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
