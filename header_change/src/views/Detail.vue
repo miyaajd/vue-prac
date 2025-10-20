@@ -146,7 +146,7 @@ const toggleLike = () => {
 };
 // confirmBtn
 const confirmBtn = () => {
-  alert(`${product.value.name}, ${quantity.value} items`);
+  alert(`${product.value.name}, '${quantity.value}' items`);
   router.push("/");
 };
 // modal
@@ -217,7 +217,7 @@ const showModal = ref(false);
         display: flex;
         gap: 10px;
         button {
-          max-width: 100px;
+          min-width: 100px;
           min-height: 30px;
           display: inline-block;
           line-height: 1;
