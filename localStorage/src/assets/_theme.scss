@@ -1,0 +1,31 @@
+@use "variables" as *;
+body {
+  background-color: $bg;
+  color: $text;
+  transition: all 0.3s ease, color 0.3s ease;
+}
+// 다크모드 테마
+html.dark {
+  body {
+    background: $dark-bg;
+    color: $dark-text;
+  }
+  a {
+    color: $dark-text;
+  }
+  h2,h3,p,span,b,li{
+    color: $dark-text;
+  }
+  .box,
+  .card,
+  .review {
+    background: $dark-box;
+    color: $dark-text;
+  }
+
+  button,
+  .theme-btn {
+    background: $dark-button-bg;
+    color: $dark-button-text;
+  }
+}
