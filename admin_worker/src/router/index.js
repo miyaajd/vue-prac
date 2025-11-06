@@ -15,6 +15,10 @@ import Inquiries_admin from "@/pages/admin/Inquiries_admin.vue";
 import Reservations_admin from "@/pages/admin/Reservations_admin.vue";
 import Settings_admin from "@/pages/admin/Settings_admin.vue";
 import Workers_admin from "@/pages/admin/Workers_admin.vue";
+import Dashboard from "@/pages/worker/Dashboard.vue";
+import Jobs from "@/pages/worker/Jobs.vue";
+import Payment from "@/components/reservation/Payment.vue";
+import Calender from "@/pages/worker/Calender.vue";
 
 const routes = [
   { path: "/", component: HomeVue, name: "HomeVue" },
@@ -42,6 +46,16 @@ const routes = [
   },
   // 기사페이지
   { path: "/worker", component: LoginWorker, name: "LoginWorker" },
+  {
+    path: "/worker/dashboard",
+    component: Dashboard,
+    redirect: "/worker/dashboard/jobs",
+    children: [
+      { path: "jobs", component: Jobs, name: "MobileJobs" },
+      { path: "payment", component: Payment, name: "MobilePayment" },
+      { path: "calender", component: Calender, name: "MobileCalender" },
+    ],
+  },
 ];
 const router = createRouter({
   history: createWebHistory(),
