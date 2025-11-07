@@ -49,6 +49,8 @@ const getWeather = async () => {
 onMounted(() => {
   getWeather();
 });
+
+
 </script>
 
 <style lang="scss" scoped></style>
