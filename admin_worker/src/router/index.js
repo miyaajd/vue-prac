@@ -17,8 +17,9 @@ import Settings_admin from "@/pages/admin/Settings_admin.vue";
 import Workers_admin from "@/pages/admin/Workers_admin.vue";
 import Dashboard from "@/pages/worker/Dashboard.vue";
 import Jobs from "@/pages/worker/Jobs.vue";
-import Payment from "@/components/reservation/Payment.vue";
+
 import Calender from "@/pages/worker/Calender.vue";
+import Payment from "@/pages/worker/Payment.vue";
 
 const routes = [
   { path: "/", component: HomeVue, name: "HomeVue" },
@@ -52,7 +53,7 @@ const routes = [
     redirect: "/worker/dashboard/jobs",
     children: [
       { path: "jobs", component: Jobs, name: "MobileJobs" },
-      { path: "payment", component: Payment, name: "MobilePayment" },
+      { path: "payment", component: Payment , name: "MobilePayment" },
       { path: "calender", component: Calender, name: "MobileCalender" },
     ],
   },

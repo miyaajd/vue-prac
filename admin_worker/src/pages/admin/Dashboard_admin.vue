@@ -10,7 +10,7 @@
       <!-- 차트 -->
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">예약 추이</h2>
-        <div class="H-64">
+        <div class="h-80">
           <Chart />
         </div>
       </div>

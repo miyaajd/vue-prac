@@ -27,7 +27,7 @@
     </header>
     <!-- 메인 (스크롤생기게)-->
     <main
-      class="bg-gray-100 overflow-y-auto overflow-x-hidden w-full max-h-[calc(100vh-68px)] pt-[100px]">
+      class="bg-gray-100 dark:bg-black overflow-y-auto overflow-x-hidden w-full max-h-[calc(100vh-68px)] pt-[140px]">
       <router-view></router-view>
     </main>
     <!-- 하단 탭바 -->

@@ -83,4 +83,16 @@ const logout = () => {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+/* 반응형 */
+@media (max-width: 758px){
+  .fixed{
+    position: relative;
+    width: 100%;
+    height: auto;
+  }
+  .ml-64{
+    margin-left: 0;
+  }
+}
+</style>
