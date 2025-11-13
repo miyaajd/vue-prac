@@ -12,7 +12,6 @@
           <div>
             <p :class="[card.labelClass, 'text-sm mb-1']">{{ card.label }}</p>
             <p class="text-3xl font-bold">
-              {{}}
               <span v-if="card.suffix">{{ card.suffix }}</span>
             </p>
           </div>
@@ -47,6 +46,7 @@
         <div class="flex gap-2">
           <input
             v-model="searchQuery"
+            @input="handleInput"
             type="text"
             placeholder="고객명으로 검색하세요"
             class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
@@ -168,8 +168,11 @@
               </td>
               <!-- 관리 -->
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <button  class="text-indigo-600 hover:text-indigo-900" @click="openConversation(conversation)">
-                  <i class="fas fa-comment-dots mr-1"></i> 대화보기
+                <button
+                  class="text-indigo-600 hover:text-indigo-900"
+                  @click="openConversation(conversation)">
+                  <i class="fas fa-comment-dots mr-1"></i>
+                  대화보기
                 </button>
               </td>
             </tr>
@@ -178,15 +181,135 @@
       </div>
     </div>
   </div>
+  <!-- 대화상세 모달 -->
+  <div
+    v-if="selectedConversation"
+    class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] flex flex-col">
+      <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] flex flex-col">
+        <!-- 상단 : 사용자정보 -->
+        <div class="p-6 border-b flex justify-between items-center">
+          <!-- 사용자 정보 -->
+          <div class="flex items-center">
+            <div
+              :class="[
+                'w-12 h-12 rounded-full flex items-center justify-center text-white font-bold',
+                getCustomerAvatarBg(selectedConversation.customerName),
+              ]">
+              {{ selectedConversation.customerName[0] }}
+            </div>
+            <!-- 사용자이름 -->
+            <div class="ml-4">
+              <h3 class="text-xl font-bold">{{ selectedConversation.customerName }}</h3>
+              <p class="text-sm text-gray-500">
+                {{ selectedConversation.email }}
+              </p>
+            </div>
+          </div>
+          <!-- 모달 닫기 버튼 -->
+          <button
+            @click="selectedConversation = null"
+            class="text-gray-400 hover:text-gray-600 cursor-pointer">
+            <i class="fas fa-times text-2xl"></i>
+          </button>
+        </div>
+        <!-- 대화내용 -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
+          <div
+            v-for="message in conversationMessages"
+            :key="message.id"
+            :class="['flex', message.sender === 'customer' ? 'justify-start' : 'justify-end']">
+            <!-- 메시지 정렬 및 데이터 확인 -->
+            <div
+              class="text-xs mb-1 opacity-70"
+              :class="[
+                'max-w-lg',
+                message.sender === 'customer' ? 'bg-white' : 'bg-indigo-600 text-white',
+                'rounded-lg p-4 shadow-sm',
+              ]">
+              <div class="text-xs mb-1 opacity-70">
+                {{ message.sender === "customer" ? selectedConversation.customerName : "관리자" }}
+              </div>
+              <div class="text-sm">{{ message.content }}</div>
+              <div class="text-xs mt-2 opacity-70">{{ formatDateTime(message.timestamp) }}</div>
+            </div>
+          </div>
+        </div>
+        <!-- 대화입력 및 답변 -->
+        <div class="p-6 border-t bg-white">
+          <div class="flex flex-col md:flex-row md:items-center gap-3">
+            <input
+              v-model="newMessage"
+              type="text"
+              class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="메시지를 입력하세요"
+              @keyup.enter="sendMessage" />
+            <div class="flex flex-wrap gap-2">
+              <button
+                @click="openQuick"
+                class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                <i class="fas fa-bolt mr-2"></i>
+                빠른답변
+              </button>
+              <button
+                @click="sendMessage"
+                class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                <i class="fas fa-paper-plane mr-2"></i>
+                전송
+              </button>
+              <button
+                @click="markAnswered"
+                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <i class="fas fa-check-circle mr-2"></i>
+                답변완료
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 빠른 답변 모달 -->
+  <div v-if="showQuick" class="fixed inset-0 bg-black/70 z-60 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-2xl w-full">
+      <div class="p-6">
+        <!-- 빠른답변 탬플릿 타이틀과 닫기버튼 -->
+        <div class="flex justify-between items-start mb-4">
+          <h3 class="text-2xl font-bold">빠른 답변 템플릿</h3>
+          <button @click="showQuick = false" class="text-gray-400 hover:text-gray-600">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+        <!-- 빠른답변 탬플릿 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <button
+            @click="selectTemplate(template)"
+            v-for="template in quickTemplates"
+            :key="template.id"
+            class="cursor-pointer p-4 border border-gray-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-colors text-left">
+            <h4 class="font-semibold mb-2">{{ template.title }}</h4>
+            <p class="text-sm text-gray-600">{{ template.content }}</p>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
 import { computed, ref } from "vue";
 
-// 버튼 클릭 함수
-const currentFilter = ref("all");
-// 서치쿼리
-const searchQuery = ref("");
+const currentFilter = ref("all"); // 버튼 클릭 함수
+const searchQuery = ref(""); // 서치쿼리
+const selectedConversation = ref(null); //초기화상태
+const newMessage = ref("");
+const showQuick = ref(false);
+
+// v-model 한글인식이슈 해결****************************************************************
+function handleInput(event) {
+  searchQuery.value = event.target.value;
+}
+// ****************************************************************************************
 
 // 더미
 const statCards = computed(() => [
@@ -277,12 +400,69 @@ const conversations = ref([
   },
 ]);
 
+// 샘플 메시지 데이터
+const allMessages = ref([
+  {
+    id: 1,
+    conversationId: 1,
+    sender: "customer",
+    content: "청소 잘 해주셔서 감사합니다!",
+    timestamp: new Date("2025-11-11T10:30:00"),
+  },
+  {
+    id: 2,
+    conversationId: 1,
+    sender: "admin",
+    content: "감사합니다! 다음에도 이용해주세요.",
+    timestamp: new Date("2025-11-10T10:45:00"),
+  },
+  {
+    id: 3,
+    conversationId: 2,
+    sender: "customer",
+    content: "청소는 언제 시작되나요?",
+    timestamp: new Date("2025-11-11T09:00:00"),
+  },
+  {
+    id: 4,
+    conversationId: 2,
+    sender: "admin",
+    content: "예약하신 시간인 오후 2시에 시작됩니다.",
+    timestamp: new Date("2025-11-10T09:15:00"),
+  },
+  {
+    id: 5,
+    conversationId: 2,
+    sender: "customer",
+    content: "청소 후 확인을 받아볼 수 있나요?",
+    timestamp: new Date("2025-11-12T14:30:00"),
+  },
+  {
+    id: 6,
+    conversationId: 3,
+    sender: "customer",
+    content: "혹시 시간 변경이 가능한가요?",
+    timestamp: new Date("2025-11-11T08:00:00"),
+  },
+]);
+
+// 메시지 아이디 카운터 (새로운 메시지를 추가할때 아이디 값을 증가시키기 위한 변수)
+const messageIdCounter = ref(
+  allMessages.value.length ? Math.max(...allMessages.value.map((m) => m.id)) + 1 : 1
+);
+
 //계산된 속성
 const filteredConversations = computed(() => {
   let result = conversations.value;
   if (currentFilter.value !== "all") {
     result = result.filter((c) => c.status === currentFilter.value);
   }
+  // 이름으로 검색하기 *********************************************************
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    result = result.filter((c) => c.customerName.toLowerCase().includes(query));
+  }
+  // **************************************************************************
   // a-b 내림차순 // b-a 오름차순
   return result.sort((a, b) => b.startDate - a.startDate);
 });
@@ -293,6 +473,17 @@ function formatDate(date) {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
+  });
+}
+
+function formatDateTime(date) {
+  if (!date) return "";
+  return new Date(date).toLocaleString("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
@@ -319,6 +510,106 @@ function getStatusText(status) {
     closed: "답변완료",
   };
   return statusMap[status];
+}
+
+// 상세대화보기
+function openConversation(conversation) {
+  // console.log(conversation);
+  selectedConversation.value = conversation;
+  isCalled.value = false; // 새로운 대화 열릴때 isCalled 값 초기화
+}
+
+// 대화 내용
+const conversationMessages = computed(() => {
+  if (!selectedConversation.value) return [];
+  return allMessages.value
+    .filter((m) => m.conversationId === selectedConversation.value.id)
+    .sort((a, b) => a.timestamp - b.timestamp);
+});
+
+// 메시지 전송을 눌렀는지 상태를 담은 변수
+const isCalled = ref(false);
+
+// 메시지 전송
+function sendMessage() {
+  if (!newMessage.value.trim() || !selectedConversation.value) return;
+  const message = {
+    id: messageIdCounter.value++,
+    conversationId: selectedConversation.value.id,
+    sender: "admin",
+    content: newMessage.value,
+    timestamp: new Date(),
+  };
+  // 올메세지에 푸시
+  allMessages.value.push(message);
+  newMessage.value = "";
+  // console.log(allMessages);
+
+  // 함수실행 상태
+  isCalled.value = true;
+}
+
+// 답변 완료
+function markAnswered() {
+  if (!selectedConversation.value) return;
+
+  // 메시지 전송을 하지 않고 답변완료를 누르면 경고************
+  if (!isCalled.value) {
+    alert("전송된 답변이 없습니다.");
+    return;
+  }
+  // *******************************************************
+  const idx = conversations.value.findIndex((c) => c.id === selectedConversation.value.id);
+  // 말안되는 인덱스번호로 조건을 검 (무조건 맞는조건)
+  if (idx !== -1) {
+    conversations.value[idx].status = "closed";
+    conversations.value[idx].unreadCount = 0;
+    selectedConversation.value = null;
+    newMessage.value = "";
+    isCalled.value = false;
+  }
+}
+
+// 빠른 답변 템플릿
+const quickTemplates = ref([
+  {
+    id: 1,
+    title: "안녕하세요",
+    content: "안녕하세요. 고객님의 문의에 답변드리겠습니다.",
+  },
+  {
+    id: 2,
+    title: "예약 확인",
+    content: "예약이 정상적으로 접수되었습니다. 담당 기사가 연락드리겠습니다.",
+  },
+  {
+    id: 3,
+    title: "감사 인사",
+    content: "이용해 주셔서 감사합니다. 만족스러운 서비스 제공을 위해 노력하겠습니다.",
+  },
+  {
+    id: 4,
+    title: "대기 요청",
+    content: "잠시만 기다려 주세요. 담당자가 확인 중입니다.",
+  },
+]);
+
+// 빠른답변
+function openQuick() {
+  if (!selectedConversation.value) {
+    alert("먼저 대화를 선택해 주세요.");
+    return;
+  }
+  showQuick.value = true;
+}
+
+// 템플릿 선택 함수
+function selectTemplate(template) {
+  if (selectedConversation.value) {
+    newMessage.value = template.content;
+    showQuick.value = false;
+    document.querySelector('input[v-model="newMessage"]')?.focus();
+  }
 }
 </script>
 
